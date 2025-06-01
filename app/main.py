@@ -1,12 +1,25 @@
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
-from app.model import predict
+from app.model import predictt
 from prometheus_fastapi_instrumentator import Instrumentator
+from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import Counter
 import time
-import os  # <-- add this import
+import os 
+import pickle
+
+
+
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 Instrumentator().instrument(app).expose(app)
 
@@ -37,8 +50,8 @@ async def predict_route(data: LandmarkRequest):
             missing_landmarks_counter.inc()
             return {"error": "Invalid landmarks: each point must have 3 values."}
     try:
-        prediction = predict(data.landmarks)
-        return {"gesture": int(prediction)}
+        prediction = predictt(data.landmarks)
+        return {"gesture": prediction}
     except Exception as e:
         return {"error": str(e)}
 
